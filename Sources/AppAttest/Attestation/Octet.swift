@@ -1,16 +1,9 @@
-//
-//  Octet.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-18.
-//
-
 extension Attestation {
     // TODO: Shorten errors or combine OID value into a struct.
     enum ParseError: Error {
-        case expectedASN1Node(oid: String)
-        case failedToExtractValueFromASN1Node(oid: String)
-        case expectedOctetStringInsideASN1Node(oid: String)
+        case expectedASN1Node(oid: String),
+             failedToExtractValueFromASN1Node(oid: String),
+             expectedOctetStringInsideASN1Node(oid: String)
     }
     
     func extractOctet() throws -> [UInt8] {
@@ -57,8 +50,9 @@ extension Optional {
         switch self {
         case .none:
             throw error
+            
         case let .some(value):
-            return value
+            value
         }
     }
 }

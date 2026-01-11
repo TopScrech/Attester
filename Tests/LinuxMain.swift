@@ -1,5 +1,4 @@
 import XCTest
-
 import AppAttestTests
 
 var tests = [XCTestCaseEntry]()

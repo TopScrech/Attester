@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-17.
-//
-
 import Anchor
 
 // TODO: Consider renaming TrustedCertificates or TrustAnchors.

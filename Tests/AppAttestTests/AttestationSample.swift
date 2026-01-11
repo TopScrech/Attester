@@ -1,10 +1,3 @@
-//
-//  AttestationSample.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-19.
-//
-
 import Foundation
 @testable import AppAttest
 
@@ -36,12 +29,11 @@ enum AttestationSample {
         let attestationBase64: String
         
         enum Environment {
-            case production
-            case development
+            case production, development
         }
         
         var encoded: Short {
-            return Short(
+            Short(
                 teamID: teamIdentifier,
                 bundleID: bundleIdentifier,
                 keyID: Data(base64Encoded: keyIdBase64)!,

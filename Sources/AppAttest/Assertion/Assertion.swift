@@ -1,10 +1,3 @@
-//
-//  Assertion.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-21.
-//
-
 import Foundation
 import Crypto
 import SwiftCBOR
@@ -13,7 +6,7 @@ struct Assertion {
     let signature: Data
     let authenticatorData: AuthenticatorData
     
-    // TODO: Consider renaming.
+    // TODO: Consider renaming
     init(cbor data: Data) throws {
         let decoder = CodableCBORDecoder()
         let decoded = try decoder.decode(CodableCBOR.self, from: data)
@@ -51,10 +44,10 @@ extension Assertion {
 
 extension Assertion {
     enum ValidationError: Error {
-        case invalidSignature // or invalidKey
-        case invalidAppID
-        case invalidCounter
-        case invalidClientData
+        case invalidSignature, // or invalidKey
+             invalidAppID,
+             invalidCounter,
+             invalidClientData
         // TODO: Make these errors more specific.
     }
     
@@ -88,7 +81,7 @@ extension Assertion {
         guard authenticatorData.rpID == Data(appIDHash) else {
             throw ValidationError.invalidAppID
         }
-
+        
         // 5. Verify that the authenticator data’s counter value is greater
         // than the value from the previous assertion, or greater than 0
         // on the first assertion.
@@ -101,7 +94,7 @@ extension Assertion {
                 throw ValidationError.invalidCounter
             }
         }
-
+        
         // 6. Verify that the challenge embedded in the client data matches
         // the earlier challenge to the client.
         guard receivedChallenge == storedChallenge else {

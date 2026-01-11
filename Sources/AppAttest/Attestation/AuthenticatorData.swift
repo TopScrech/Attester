@@ -1,10 +1,3 @@
-//
-//  AuthenticatorData.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-18.
-//
-
 import Foundation
 
 /// Authenticator data as specified by the
@@ -53,8 +46,8 @@ struct AuthenticatorData: Equatable {
     let aaguid: AAGUID
     
     enum AAGUID: String, CaseIterable {
-        case appAttest = "appattest"
-        case appAttestDevelop = "appattestdevelop"
+        case appAttest = "appattest",
+             appAttestDevelop = "appattestdevelop"
         
         init?(bytes: Data) {
             if let id = AAGUID.allCases.first(where: { bytes == $0.bytes }) {
@@ -66,9 +59,11 @@ struct AuthenticatorData: Equatable {
         
         var bytes: Data {
             let data = rawValue.data(using: .utf8)!
+            
             switch self {
             case .appAttestDevelop:
                 return data
+                
             case .appAttest:
                 return data + Data(repeatElement(0x00, count: 7))
             }
@@ -81,6 +76,7 @@ struct AuthenticatorData: Equatable {
         let length = bytes[53..<55].reduce(0) { value, byte in
             value << 8 | UInt16(byte)
         } // TODO: Refactor this into a generic function.
+        
         return bytes[55..<(55 + length)]
     }
 }

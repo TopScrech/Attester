@@ -1,16 +1,3 @@
-//===----------------------------------------------------------------------===//
-//
-// This source file is part of the SwiftCrypto open source project
-//
-// Copyright (c) 2019-2020 Apple Inc. and the SwiftCrypto project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.md for the list of SwiftCrypto project authors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-//===----------------------------------------------------------------------===//
 #if (os(macOS) || os(iOS) || os(watchOS) || os(tvOS)) && CRYPTO_IN_SWIFTPM && !CRYPTO_IN_SWIFTPM_FORCE_BUILD_API
 @_exported import CryptoKit
 #else
@@ -103,7 +90,7 @@ import Foundation
 // generally: that is, we don't hard-code special knowledge of these formats as part of the parsing process. Instead we have written a
 // parser that can divide the world of ASN.1 into parseable chunks, and then we try to decode specific formats from those chunks. This
 // allows us to extend things in the future without too much pain.
-internal enum ASN1 { }
+internal enum ASN1 {}
 
 // MARK: - Parser Node
 extension ASN1 {
@@ -115,20 +102,20 @@ extension ASN1 {
     fileprivate struct ASN1ParserNode {
         /// The identifier.
         var identifier: ASN1Identifier
-
+        
         /// The depth of this node.
         var depth: Int
-
+        
         /// The data bytes for this node, if it is primitive.
         var dataBytes: ArraySlice<UInt8>?
     }
 }
 
-extension ASN1.ASN1ParserNode: Hashable { }
+extension ASN1.ASN1ParserNode: Hashable {}
 
 extension ASN1.ASN1ParserNode: CustomStringConvertible {
     var description: String {
-        return "ASN1.ASN1ParserNode(identifier: \(self.identifier), depth: \(self.depth), dataBytes: \(self.dataBytes?.count ?? 0))"
+        "ASN1.ASN1ParserNode(identifier: \(self.identifier), depth: \(self.depth), dataBytes: \(self.dataBytes?.count ?? 0))"
     }
 }
 
@@ -139,15 +126,15 @@ extension ASN1 {
         guard node.identifier == .sequence, case .constructed(let nodes) = node.content else {
             throw CryptoKitASN1Error.unexpectedFieldType
         }
-
+        
         var iterator = nodes.makeIterator()
-
+        
         let result = try builder(&iterator)
-
+        
         guard iterator.next() == nil else {
             throw CryptoKitASN1Error.invalidASN1Object
         }
-
+        
         return result
     }
 }
@@ -163,28 +150,28 @@ extension ASN1 {
             // Node not present, return nil.
             return nil
         }
-
+        
         let expectedNodeID = ASN1.ASN1Identifier(explicitTagWithNumber: tagNumber, tagClass: tagClass)
         assert(expectedNodeID.constructed)
         guard node.identifier == expectedNodeID else {
             // Node is a mismatch, with the wrong tag. Our optional isn't present.
             return nil
         }
-
+        
         // We have the right optional, so let's consume it.
         nodes = localNodesCopy
-
+        
         // We expect a single child.
         guard case .constructed(let nodes) = node.content else {
             // This error is an internal parser error: the tag above is always constructed.
             preconditionFailure("Explicit tags are always constructed")
         }
-
+        
         var nodeIterator = nodes.makeIterator()
         guard let child = nodeIterator.next(), nodeIterator.next() == nil else {
             throw CryptoKitASN1Error.invalidASN1Object
         }
-
+        
         return try builder(child)
     }
 }
@@ -194,25 +181,25 @@ extension ASN1 {
     /// A parsed representation of ASN.1.
     fileprivate struct ASN1ParseResult {
         private static let maximumNodeDepth = 10
-
+        
         var nodes: ArraySlice<ASN1ParserNode>
-
+        
         private init(_ nodes: ArraySlice<ASN1ParserNode>) {
             self.nodes = nodes
         }
-
+        
         fileprivate static func parse(_ data: ArraySlice<UInt8>) throws -> ASN1ParseResult {
             var data = data
             var nodes = [ASN1ParserNode]()
             nodes.reserveCapacity(16)
-
+            
             try parseNode(from: &data, depth: 1, into: &nodes)
             guard data.count == 0 else {
                 throw CryptoKitASN1Error.invalidASN1Object
             }
             return ASN1ParseResult(nodes[...])
         }
-
+        
         /// Parses a single ASN.1 node from the data and appends it to the buffer. This may recursively
         /// call itself when there are child nodes for constructed nodes.
         private static func parseNode(from data: inout ArraySlice<UInt8>, depth: Int, into nodes: inout [ASN1ParserNode]) throws {
@@ -221,30 +208,32 @@ extension ASN1 {
                 // the parsing.
                 throw CryptoKitASN1Error.invalidASN1Object
             }
-
+            
             guard let rawIdentifier = data.popFirst() else {
                 throw CryptoKitASN1Error.truncatedASN1Field
             }
-
+            
             let identifier = try ASN1Identifier(rawIdentifier: rawIdentifier)
+            
             guard let wideLength = try data.readASN1Length() else {
                 throw CryptoKitASN1Error.truncatedASN1Field
             }
-
+            
             // UInt is sometimes too large for us!
             guard let length = Int(exactly: wideLength) else {
                 throw CryptoKitASN1Error.invalidASN1Object
             }
-
+            
             var subData = data.prefix(length)
             data = data.dropFirst(length)
-
+            
             guard subData.count == length else {
                 throw CryptoKitASN1Error.truncatedASN1Field
             }
-
+            
             if identifier.constructed {
                 nodes.append(ASN1ParserNode(identifier: identifier, depth: depth, dataBytes: nil))
+                
                 while subData.count > 0 {
                     try parseNode(from: &subData, depth: depth + 1, into: &nodes)
                 }
@@ -255,20 +244,21 @@ extension ASN1 {
     }
 }
 
-extension ASN1.ASN1ParseResult: Hashable { }
+extension ASN1.ASN1ParseResult: Hashable {}
 
 extension ASN1 {
     static func parse(_ data: [UInt8]) throws -> ASN1Node {
         return try parse(data[...])
     }
-
+    
     static func parse(_ data: ArraySlice<UInt8>) throws -> ASN1Node {
         var result = try ASN1ParseResult.parse(data)
-
+        
         // There will always be at least one node if the above didn't throw, so we can safely just removeFirst here.
         let firstNode = result.nodes.removeFirst()
-
+        
         let rootNode: ASN1Node
+        
         if firstNode.identifier.constructed {
             // We need to feed it the next set of nodes.
             let nodeCollection = result.nodes.prefix { $0.depth > firstNode.depth }
@@ -277,9 +267,9 @@ extension ASN1 {
         } else {
             rootNode = ASN1.ASN1Node(identifier: firstNode.identifier, content: .primitive(firstNode.dataBytes!))
         }
-
+        
         precondition(result.nodes.count == 0, "ASN1ParseResult unexpectedly allowed multiple root nodes")
-
+        
         return rootNode
     }
 }
@@ -292,14 +282,15 @@ extension ASN1 {
     /// It allows us to lazily construct the child nodes, potentially skipping over them when we don't care about them.
     internal struct ASN1NodeCollection {
         private var nodes: ArraySlice<ASN1ParserNode>
-
+        
         private var depth: Int
-
+        
         fileprivate init(nodes: ArraySlice<ASN1ParserNode>, depth: Int) {
             self.nodes = nodes
             self.depth = depth
-
+            
             precondition(self.nodes.allSatisfy({ $0.depth > depth }))
+            
             if let firstDepth = self.nodes.first?.depth {
                 precondition(firstDepth == depth + 1)
             }
@@ -311,18 +302,19 @@ extension ASN1.ASN1NodeCollection: Sequence {
     struct Iterator: IteratorProtocol {
         private var nodes: ArraySlice<ASN1.ASN1ParserNode>
         private var depth: Int
-
+        
         fileprivate init(nodes: ArraySlice<ASN1.ASN1ParserNode>, depth: Int) {
             self.nodes = nodes
             self.depth = depth
         }
-
+        
         mutating func next() -> ASN1.ASN1Node? {
             guard let nextNode = self.nodes.popFirst() else {
                 return nil
             }
-
+            
             assert(nextNode.depth == self.depth + 1)
+            
             if nextNode.identifier.constructed {
                 // We need to feed it the next set of nodes.
                 let nodeCollection = self.nodes.prefix { $0.depth > nextNode.depth }
@@ -334,9 +326,9 @@ extension ASN1.ASN1NodeCollection: Sequence {
             }
         }
     }
-
+    
     func makeIterator() -> Iterator {
-        return Iterator(nodes: self.nodes, depth: self.depth)
+        Iterator(nodes: self.nodes, depth: self.depth)
     }
 }
 
@@ -352,7 +344,6 @@ extension ASN1 {
     /// node that contains other objects and primitives, eventually reaching the bottom which is made up of primitive objects.
     internal struct ASN1Node {
         internal var identifier: ASN1Identifier
-
         internal var content: Content
     }
 }
@@ -361,8 +352,8 @@ extension ASN1 {
 extension ASN1.ASN1Node {
     /// The content of a single ASN1Node.
     enum Content {
-        case constructed(ASN1.ASN1NodeCollection)
-        case primitive(ArraySlice<UInt8>)
+        case constructed(ASN1.ASN1NodeCollection),
+             primitive(ArraySlice<UInt8>)
     }
 }
 
@@ -370,35 +361,36 @@ extension ASN1.ASN1Node {
 extension ASN1 {
     struct Serializer {
         private(set) var serializedBytes: [UInt8]
-
+        
         init() {
             // We allocate a 1kB array because that should cover us most of the time.
             self.serializedBytes = []
             self.serializedBytes.reserveCapacity(1024)
         }
-
+        
         /// Appends a single, non-constructed node to the content.
         mutating func appendPrimitiveNode(identifier: ASN1.ASN1Identifier, _ contentWriter: (inout [UInt8]) throws -> Void) rethrows {
             assert(identifier.primitive)
             try self._appendNode(identifier: identifier) { try contentWriter(&$0.serializedBytes) }
         }
-
+        
         mutating func appendConstructedNode(identifier: ASN1.ASN1Identifier, _ contentWriter: (inout Serializer) throws -> Void) rethrows {
             assert(identifier.constructed)
             try self._appendNode(identifier: identifier, contentWriter)
         }
-
+        
         mutating func serialize<T: ASN1Serializable>(_ node: T) throws {
             try node.serialize(into: &self)
         }
-
+        
         mutating func serialize<T: ASN1Serializable>(_ node: T, explicitlyTaggedWithTagNumber tagNumber: Int, tagClass: ASN1.ASN1Identifier.TagClass) throws {
             let identifier = ASN1Identifier(explicitTagWithNumber: tagNumber, tagClass: tagClass)
+            
             try self.appendConstructedNode(identifier: identifier) { coder in
                 try coder.serialize(node)
             }
         }
-
+        
         // This is the base logical function that all other append methods are built on. This one has most of the logic, and doesn't
         // police what we expect to happen in the content writer.
         private mutating func _appendNode(identifier: ASN1.ASN1Identifier, _ contentWriter: (inout Serializer) throws -> Void) rethrows {
@@ -407,40 +399,41 @@ extension ASN1 {
             // If it turns out to have been longer, we recalculate how many bytes we need and shuffle them in the buffer,
             // before updating the length. Most of the time we'll be right: occasionally we'll be wrong and have to shuffle.
             self.serializedBytes.writeIdentifier(identifier)
-
+            
             // Write a zero for the length.
             self.serializedBytes.append(0)
-
+            
             // Save the indices and write.
             let originalEndIndex = self.serializedBytes.endIndex
             let lengthIndex = self.serializedBytes.index(before: originalEndIndex)
-
+            
             try contentWriter(&self)
-
+            
             let contentLength = self.serializedBytes.distance(from: originalEndIndex, to: self.serializedBytes.endIndex)
             let lengthBytesNeeded = contentLength.bytesNeededToEncode
+            
             if lengthBytesNeeded == 1 {
                 // We can just set this at the top, and we're done!
                 assert(contentLength <= 0x7F)
                 self.serializedBytes[lengthIndex] = UInt8(contentLength)
                 return
             }
-
+            
             // Whoops, we need more than one byte to represent the length. That's annoying!
             // To sort this out we want to "move" the memory to the right.
             self.serializedBytes.moveRange(offset: lengthBytesNeeded - 1, range: originalEndIndex..<self.serializedBytes.endIndex)
-
+            
             // Now we can write the length bytes back. We first write the number of length bytes
             // we needed, setting the high bit. Then we write the bytes of the length.
             self.serializedBytes[lengthIndex] = 0x80 | UInt8(lengthBytesNeeded - 1)
             var writeIndex = lengthIndex
-
+            
             for shift in (0..<(lengthBytesNeeded - 1)).reversed() {
                 // Shift and mask the integer.
                 self.serializedBytes.formIndex(after: &writeIndex)
                 self.serializedBytes[writeIndex] = UInt8((contentLength >> (shift * 8)) | 0x80 )
             }
-
+            
             assert(writeIndex == self.serializedBytes.index(lengthIndex, offsetBy: lengthBytesNeeded - 1))
         }
     }
@@ -456,10 +449,10 @@ extension ASN1Parseable {
         guard let node = sequenceNodeIterator.next() else {
             throw CryptoKitASN1Error.invalidASN1Object
         }
-
+        
         self = try .init(asn1Encoded: node)
     }
-
+    
     internal init(asn1Encoded: [UInt8]) throws {
         self = try .init(asn1Encoded: ASN1.parse(asn1Encoded))
     }
@@ -474,30 +467,34 @@ extension ArraySlice where Element == UInt8 {
         guard let firstByte = self.popFirst() else {
             return nil
         }
-
+        
         switch firstByte {
         case 0x80:
             // Indefinite form. Unsupported.
             throw CryptoKitASN1Error.unsupportedFieldLength
+            
         case let val where val & 0x80 == 0x80:
             // Top bit is set, this is the long form. The remaining 7 bits of this octet
             // determine how long the length field is.
             let fieldLength = Int(val & 0x7F)
+            
             guard self.count >= fieldLength else {
                 return nil
             }
-
+            
             // We need to read the length bytes
             let lengthBytes = self.prefix(fieldLength)
             self = self.dropFirst(fieldLength)
             let length = try UInt(bigEndianBytes: lengthBytes)
-
+            
             // DER requires that we enforce that the length field was encoded in the minimum number of octets necessary.
             let requiredBits = UInt.bitWidth - length.leadingZeroBitCount
+            
             switch requiredBits {
             case 0...7:
                 // For 0 to 7 bits, the long form is unnacceptable and we require the short.
                 throw CryptoKitASN1Error.unsupportedFieldLength
+                
             case 8...:
                 // For 8 or more bits, fieldLength should be the minimum required.
                 let requiredBytes = (requiredBits + 7) / 8
@@ -508,8 +505,9 @@ extension ArraySlice where Element == UInt8 {
                 // This is not reachable, but we'll error anyway.
                 throw CryptoKitASN1Error.unsupportedFieldLength
             }
-
+            
             return length
+            
         case let val:
             // Short form, the length is only one 7-bit integer.
             return UInt(val)
@@ -522,11 +520,11 @@ extension FixedWidthInteger {
         guard bytes.count <= (Self.bitWidth / 8) else {
             throw CryptoKitASN1Error.invalidASN1Object
         }
-
+        
         self = 0
         let shiftSizes = stride(from: 0, to: bytes.count * 8, by: 8).reversed()
-
         var index = bytes.startIndex
+        
         for shift in shiftSizes {
             self |= Self(truncatingIfNeeded: bytes[index]) << shift
             bytes.formIndex(after: &index)
@@ -538,20 +536,21 @@ extension Array where Element == UInt8 {
     fileprivate mutating func writeIdentifier(_ identifier: ASN1.ASN1Identifier) {
         self.append(identifier.baseTag)
     }
-
+    
     fileprivate mutating func moveRange(offset: Int, range: Range<Index>) {
         // We only bothered to implement this for positive offsets for now, the algorithm
         // generalises.
         precondition(offset > 0)
-
+        
         let distanceFromEndOfRangeToEndOfSelf = self.distance(from: range.endIndex, to: self.endIndex)
+        
         if distanceFromEndOfRangeToEndOfSelf < offset {
             // We begin by writing some zeroes out to the size we need.
             for _ in 0..<(offset - distanceFromEndOfRangeToEndOfSelf) {
                 self.append(0)
             }
         }
-
+        
         // Now we walk the range backwards, moving the elements.
         for index in range.reversed() {
             self[index + offset] = self[index]

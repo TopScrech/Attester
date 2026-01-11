@@ -1,10 +1,3 @@
-//
-//  Attestation.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-16.
-//
-
 import Foundation
 import Crypto
 import SwiftCBOR
@@ -25,6 +18,7 @@ struct Attestation: Equatable {
     init(data: Data) throws {
         let _attestation = try CodableCBOR(data: data)
         format = _attestation.format
+        
         statement = try Statement(
             certificates: _attestation.statement.x5c.map {
                 try X509.Certificate(bytes: $0, format: .der)
@@ -52,9 +46,9 @@ extension Attestation {
         }
         
         enum CodingKeys: String, CodingKey {
-            case format = "fmt"
-            case statement = "attStmt"
-            case authenticatorData = "authData"
+            case format = "fmt",
+                 statement = "attStmt",
+                 authenticatorData = "authData"
         }
         
         init(data: Data) throws {

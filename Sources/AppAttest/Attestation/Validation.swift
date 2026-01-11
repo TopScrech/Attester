@@ -1,21 +1,14 @@
-//
-//  Validation.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-18.
-//
-
 import Foundation
 import Crypto
 import Anchor
 
 extension Attestation {
     enum ValidationError: Error {
-        case invalidNonce
-        case invalidAppIDHash
-        case invalidPublicKey
-        case invalidCounter
-        case invalidCredentialID
+        case invalidNonce,
+             invalidAppIDHash,
+             invalidPublicKey,
+             invalidCounter,
+             invalidCredentialID
     }
     // TODO: Rewrite as a struct with expected and received
     // or with compared values. Or add associated types.
@@ -88,11 +81,13 @@ extension Attestation {
     /// the key identifier from your app.
     func publicKeyMatchesKeyID(_ keyID: Data) -> Bool {
         let certificate = statement.certificates[0]
+        
         guard let publicKey = certificate.publicKey else {
             return false
             //fatalError()
             // TODO: Throw meaningful error.
         }
+        
         let hash = SHA256.hash(data: publicKey)
         return hash == keyID
     }
@@ -105,6 +100,7 @@ extension AuthenticatorData {
         let hash = appID.data(using: .utf8)
             .map { SHA256.hash(data: $0) }
             .map { Data($0) }
+        
         guard rpID == hash else {
             throw Attestation.ValidationError.invalidAppIDHash
         }

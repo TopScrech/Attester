@@ -51,8 +51,7 @@ struct AssertionSample {
         let assertionBase64: String
         
         enum Environment {
-            case production
-            case development
+            case production, development
         }
         
         var encoded: Short {

@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:6.2.1
 
 import PackageDescription
 
@@ -6,14 +6,12 @@ let package = Package(
     name: "AppAttest",
     platforms: [.iOS(.v14), .macOS(.v10_15)],
     products: [
-        .library(
-            name: "AppAttest",
-            targets: ["AppAttest"]),
+        .library(name: "AppAttest", targets: ["AppAttest"])
     ],
     dependencies: [
         .package(url: "https://github.com/myfreeweb/SwiftCBOR", from: "0.4.6"),
         .package(url: "https://github.com/apple/swift-crypto", from: "3.1.0"),
-        .package(url: "https://github.com/iansampson/Anchor", branch: "main"),
+        .package(url: "https://github.com/iansampson/Anchor", branch: "main")
     ],
     targets: [
         .target(
@@ -24,9 +22,6 @@ let package = Package(
                 "Anchor"
             ]
         ),
-        .testTarget(
-            name: "AppAttestTests",
-            dependencies: ["AppAttest"]
-        )
+        .testTarget(name: "AppAttestTests", dependencies: ["AppAttest"])
     ]
 )
