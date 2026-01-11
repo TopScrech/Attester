@@ -3,10 +3,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "AppAttest",
+    name: "Attester",
     platforms: [.iOS(.v14), .macOS(.v10_15)],
     products: [
-        .library(name: "AppAttest", targets: ["AppAttest"])
+        .library(name: "Attester", targets: ["Attester"])
     ],
     dependencies: [
         .package(url: "https://github.com/myfreeweb/SwiftCBOR", from: "0.4.6"),
@@ -15,13 +15,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "AppAttest",
+            name: "Attester",
             dependencies: [
                 "SwiftCBOR",
                 .product(name: "Crypto", package: "swift-crypto"),
                 "Anchor"
             ]
         ),
-        .testTarget(name: "AppAttestTests", dependencies: ["AppAttest"])
+        .testTarget(name: "AttesterTests", dependencies: ["Attester"])
     ]
 )

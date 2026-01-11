@@ -1,4 +1,4 @@
-# AppAttest
+# Attester
 
 The App Attest service, which Apple introduced in iOS 14, provides a secure way of verifying that connections to your server come from legitimate instances of your app. Generating assertions and attestations in your app is [fairly straightforward](https://developer.apple.com/documentation/devicecheck/establishing_your_app_s_integrity), but verifying them on the server is [a little more complicated](https://developer.apple.com/documentation/devicecheck/validating_apps_that_connect_to_your_server). This Swift package implements the server-side validation logic for you.
 
@@ -7,13 +7,13 @@ Note that this is still a young project and the API may change a little. At the 
 
 ## Installation
 
-AppAttest is distributed with the [Swift Package Manager](https://swift.org/package-manager/). To install it, add the following dependency to your `Package.swift` manifest:
+Attester is distributed with the [Swift Package Manager](https://swift.org/package-manager/). To install it, add the following dependency to your `Package.swift` manifest:
 
 ``` Swift
 let package = Package(
     ...
     dependencies: [
-        .package(url: "https://github.com/iansampson/AppAttest.git", branch: "main")
+        .package(url: "https://github.com/topscrech/Attester.git", branch: "main")
     ],
     ...
 )
@@ -72,10 +72,10 @@ service.attestKey(keyId, clientDataHash: hash) { attestation, error in
 }
 ```
 
-Your app sends the attestation to your server (along with the key ID and the challenge ID, if you generated one in the first step). You’ll also need your 10-digit team ID (which you can find in App Store Connect) and your app’s bundle ID. Your server then calls the static AppAttest.verifyAttestation method.
+Your app sends the attestation to your server (along with the key ID and the challenge ID, if you generated one in the first step). You’ll also need your 10-digit team ID (which you can find in App Store Connect) and your app’s bundle ID. Your server then calls the static Attester.verifyAttestation method.
 
 ``` Swift
-import AppAttest
+import Attester
 
 // Retrieve these values from the HTTP request
 // that your app sends to the server
@@ -93,7 +93,7 @@ let appID = AppID(teamID: "83Z139DVZ2", bundleID: "com.example.myapp")
 
 // Verify the attestation
 do {
-    let result = try AppAttest.verifyAttestation(challenge: challenge, request: request, appID: appID)
+    let result = try Attester.verifyAttestation(challenge: challenge, request: request, appID: appID)
 } catch {
     // Handle the error
 }
@@ -145,10 +145,10 @@ let attestation = ...
 let previousAssertion = ...
 
 // Construct the assertion request
-let response = AppAttest.AssertionRequest(clientResponse: assertion)
+let response = Attester.AssertionRequest(clientResponse: assertion)
 
 do {
-    let result = try AppAttest.verifyAssertion(challenge: challenge,
+    let result = try Attester.verifyAssertion(challenge: challenge,
                                                response: response,
                                                previousResult: previousAssertion,
                                                publicKey: attestation.publicKey,

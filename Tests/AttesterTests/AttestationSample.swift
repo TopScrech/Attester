@@ -1,5 +1,5 @@
 import Foundation
-@testable import AppAttest
+@testable import Attester
 
 enum AttestationSample {
     struct Short {

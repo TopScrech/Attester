@@ -1,5 +1,5 @@
 import XCTest
-@testable import AppAttest
+@testable import Attester
 import Crypto
 
 final class AppAttestTests: XCTestCase {    

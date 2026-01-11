@@ -1,12 +1,5 @@
-//
-//  AssertionSample.swift
-//  
-//
-//  Created by Ian Sampson on 2020-12-21.
-//
-
 import Foundation
-@testable import AppAttest
+@testable import Attester
 
 struct AssertionSample {
     struct Short {
