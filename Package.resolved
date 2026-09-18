@@ -1,34 +1,42 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Anchor",
-        "repositoryURL": "https://github.com/iansampson/Anchor",
-        "state": {
-          "branch": "main",
-          "revision": "1b1d5a9eec5413247bd79ede386bb704e15fff02",
-          "version": null
-        }
-      },
-      {
-        "package": "swift-crypto",
-        "repositoryURL": "https://github.com/apple/swift-crypto",
-        "state": {
-          "branch": null,
-          "revision": "b51f1d6845b353a2121de1c6a670738ec33561a6",
-          "version": "3.1.0"
-        }
-      },
-      {
-        "package": "SwiftCBOR",
-        "repositoryURL": "https://github.com/myfreeweb/SwiftCBOR",
-        "state": {
-          "branch": null,
-          "revision": "edc01765cf6b3685bb622bb09242ef5964fb991b",
-          "version": "0.4.6"
-        }
+  "originHash" : "7dfe080fb97918cb9fa0aa55b9940203f9accc2587e34c09dcbe45ca71ab10df",
+  "pins" : [
+    {
+      "identity" : "anchor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iansampson/Anchor",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1b1d5a9eec5413247bd79ede386bb704e15fff02"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "swift-asn1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-asn1.git",
+      "state" : {
+        "revision" : "3b6410f7dee09eb33cdd26260c5fd47fda19b0e2",
+        "version" : "1.7.3"
+      }
+    },
+    {
+      "identity" : "swift-crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-crypto",
+      "state" : {
+        "revision" : "95ba0316a9b733e92bb6b071255ff46263bbe7dc",
+        "version" : "3.15.1"
+      }
+    },
+    {
+      "identity" : "swiftcbor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/myfreeweb/SwiftCBOR",
+      "state" : {
+        "revision" : "fd929a6d8f7651ce0f63fc99397fd5762358cc29",
+        "version" : "0.6.0"
+      }
+    }
+  ],
+  "version" : 3
 }
